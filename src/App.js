@@ -1,23 +1,37 @@
-import logo from './logo.svg';
 import './App.css';
+import { useDispatch, useSelector } from 'react-redux';
+import Todo from './components/Todo/Todo';
+
+import { useListTodosQuery } from './api/todos';
+import { setTodos } from './state/todos';
 
 function App() {
+  const dispatch = useDispatch();
+
+  const { data: todos, isLoading } = useListTodosQuery({
+    skip: 0,
+    limit: 5,
+    delay: 2000,
+  });
+
+  dispatch(setTodos(todos));
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {isLoading && <h1>isLoading</h1>}
+
+      {(!isLoading && todos) && 
+        <div className="todos-container">
+          {todos.map(todo => (
+            <Todo
+              id={todo.id}
+              name={todo.name}
+              completed={todo.completed.toString()}
+            />
+          ))}
+        </div>
+      }
+
     </div>
   );
 }
